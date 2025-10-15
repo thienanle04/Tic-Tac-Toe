@@ -1,8 +1,8 @@
 import Square from "./Square";
 
-function Board({ xIsNext, squares, onPlay }) {
+function Board({ xIsNext, squares, onPlay, boardSize }) {
   function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]) {
+    if (winner || squares[i]) {
       return;
     }
     const nextSquares = squares.slice();
@@ -14,54 +14,95 @@ function Board({ xIsNext, squares, onPlay }) {
     onPlay(nextSquares);
   }
 
-  const winner = calculateWinner(squares);
+  // The result from calculateWinner is now an object with the winner and the winning line.
+  const winnerInfo = calculateWinner(squares, boardSize);
+  const winner = winnerInfo ? winnerInfo.winner : null;
+  const winningLine = winnerInfo ? winnerInfo.line : [];
+
   let status;
+  // New logic to handle a winner, a draw, or the next player's turn.
   if (winner) {
     status = 'Winner: ' + winner;
+  } else if (squares.every(Boolean)) {
+    // If every square is filled and there's no winner, it's a draw.
+    status = "It's a draw!";
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
 
+  const boardRows = [];
+  for (let row = 0; row < boardSize; row++) {
+    const rowSquares = [];
+    for (let col = 0; col < boardSize; col++) {
+      const squareIndex = row * boardSize + col;
+      rowSquares.push(
+        <Square
+          key={squareIndex}
+          value={squares[squareIndex]}
+          onSquareClick={() => handleClick(squareIndex)}
+          // Pass a prop to the Square if it's part of the winning line.
+          isWinningSquare={winningLine.includes(squareIndex)}
+        />
+      );
+    }
+    boardRows.push(<div className="board-row" key={row}>{rowSquares}</div>);
+  }
+
   return (
     <>
+      {/* You can add this style tag to your main CSS file or index.html to see the highlight */}
+      <style>{`.square.winner { background-color: #90ee90; }`}</style>
       <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
+      {boardRows}
     </>
   );
 }
 
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+function calculateWinner(squares, boardSize) {
+  const getIndex = (row, col) => row * boardSize + col;
+
+  const winLength = boardSize >= 5 ? 5 : boardSize;
+
+  for (let row = 0; row < boardSize; row++) {
+    for (let col = 0; col < boardSize; col++) {
+      const player = squares[getIndex(row, col)];
+      if (!player) continue;
+
+      // Check horizontally (right)
+      if (col + winLength <= boardSize) {
+        const line = Array.from({ length: winLength }, (_, i) => getIndex(row, col + i));
+        if (line.every(index => squares[index] === player)) {
+          return { winner: player, line };
+        }
+      }
+
+      // Check vertically (down)
+      if (row + winLength <= boardSize) {
+        const line = Array.from({ length: winLength }, (_, i) => getIndex(row + i, col));
+        if (line.every(index => squares[index] === player)) {
+          return { winner: player, line };
+        }
+      }
+
+      // Check diagonally (down-right)
+      if (row + winLength <= boardSize && col + winLength <= boardSize) {
+        const line = Array.from({ length: winLength }, (_, i) => getIndex(row + i, col + i));
+        if (line.every(index => squares[index] === player)) {
+          return { winner: player, line };
+        }
+      }
+
+      // Check diagonally (down-left)
+      if (row + winLength <= boardSize && col - winLength + 1 >= 0) {
+        const line = Array.from({ length: winLength }, (_, i) => getIndex(row + i, col - i));
+        if (line.every(index => squares[index] === player)) {
+          return { winner: player, line };
+        }
+      }
     }
   }
+
   return null;
 }
 
-export default Board;
+export default Board

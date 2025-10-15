@@ -6,6 +6,7 @@ function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+  const [isAscending, setIsAscending] = useState(true);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -17,6 +18,10 @@ function Game() {
     setCurrentMove(nextMove);
   }
 
+  function handleSortToggle() {
+    setIsAscending(!isAscending);
+  }
+
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
@@ -26,21 +31,32 @@ function Game() {
     }
     return (
       <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
+        {/* If the current list item is the move we are on, show text. Otherwise, show a button. */}
+        {move === currentMove ? (
+          <span>You are at move #{move}</span>
+        ) : (
+          <button onClick={() => jumpTo(move)}>{description}</button>
+        )}
       </li>
     );
   });
 
+  // Conditionally sort the moves based on the state
+  const sortedMoves = isAscending ? moves : moves.slice().reverse();
+
   return (
     <div className="game">
-      <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+          <div className="game-board">
+              <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} boardSize={3}/>
+          </div>
+          <div className="game-info">
+              <button onClick={handleSortToggle}>
+                  {isAscending ? 'Sort descending' : 'Sort ascending'}
+              </button>
+              <ol>{sortedMoves}</ol>
+          </div>
       </div>
-      <div className="game-info">
-        <ol>{moves}</ol>
-      </div>
-    </div>
   );
 }
 
-export default Game;
+export default Game
