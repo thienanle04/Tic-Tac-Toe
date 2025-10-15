@@ -1,14 +1,19 @@
 import Board from "./Board";
 import { useState } from "react";
 import ToggleButton from "@mui/material/ToggleButton";
-import SwapVertIcon from '@mui/icons-material/SwapVert';
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 
 function Game() {
+  const [boardSize, setBoardSize] = useState(3);
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
   const [isAscending, setIsAscending] = useState(true);
+
+  function handleBoardSizeChange(newSize) {
+    setBoardSize(newSize);
+  }
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -48,12 +53,25 @@ function Game() {
 
   return (
     <div className="game">
+      {/* --- UPDATED: Replaced buttons with a select dropdown --- */}
+      <div className="game-settings">
+        <h4>Select Board Size:</h4>
+        <select
+          value={boardSize}
+          onChange={(e) => handleBoardSizeChange(parseInt(e.target.value, 10))}
+        >
+          <option value="3">3x3</option>
+          <option value="4">4x4</option>
+          <option value="5">5x5</option>
+          <option value="6">6x6</option>
+        </select>
+      </div>
       <div className="game-board">
         <Board
           xIsNext={xIsNext}
           squares={currentSquares}
           onPlay={handlePlay}
-          boardSize={3}
+          boardSize={boardSize}
         />
       </div>
       <div className="game-info">
