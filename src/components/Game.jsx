@@ -1,5 +1,7 @@
 import Board from "./Board";
 import { useState } from "react";
+import ToggleButton from "@mui/material/ToggleButton";
+import SwapVertIcon from '@mui/icons-material/SwapVert';
 
 function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
@@ -25,9 +27,9 @@ function Game() {
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
-      description = 'Go to move #' + move;
+      description = "Go to move #" + move;
     } else {
-      description = 'Go to game start';
+      description = "Go to game start";
     }
     return (
       <li key={move}>
@@ -46,17 +48,25 @@ function Game() {
 
   return (
     <div className="game">
-          <div className="game-board">
-              <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} boardSize={3}/>
-          </div>
-          <div className="game-info">
-              <button onClick={handleSortToggle}>
-                  {isAscending ? 'Sort descending' : 'Sort ascending'}
-              </button>
-              <ol>{sortedMoves}</ol>
-          </div>
+      <div className="game-board">
+        <Board
+          xIsNext={xIsNext}
+          squares={currentSquares}
+          onPlay={handlePlay}
+          boardSize={3}
+        />
       </div>
+      <div className="game-info">
+        <ToggleButton
+          selected={isAscending} // Control the visual 'selected' state
+          onChange={handleSortToggle}
+        >
+          <SwapVertIcon />
+        </ToggleButton>
+        <ol>{sortedMoves}</ol>
+      </div>
+    </div>
   );
 }
 
-export default Game
+export default Game;
