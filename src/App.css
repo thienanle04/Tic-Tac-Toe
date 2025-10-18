@@ -80,6 +80,7 @@ body {
 .status {
   margin-bottom: 10px;
 }
+
 .game {
   display: flex;
   flex-direction: row;
@@ -87,4 +88,8 @@ body {
 
 .game-info {
   margin-left: 20px;
+}
+
+.square.winner {
+  background-color: #90ee90;
 }

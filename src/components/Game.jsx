@@ -11,8 +11,14 @@ function Game() {
   const currentSquares = history[currentMove];
   const [isAscending, setIsAscending] = useState(true);
 
+  function resetGamePlay() {
+    setHistory([Array(boardSize * boardSize).fill(null)])
+    setCurrentMove(0)
+  }
+  
   function handleBoardSizeChange(newSize) {
     setBoardSize(newSize);
+    resetGamePlay() 
   }
 
   function handlePlay(nextSquares) {

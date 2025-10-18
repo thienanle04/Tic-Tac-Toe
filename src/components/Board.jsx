@@ -50,8 +50,6 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
 
   return (
     <>
-      {/* You can add this style tag to your main CSS file or index.html to see the highlight */}
-      <style>{`.square.winner { background-color: #90ee90; }`}</style>
       <div className="status">{status}</div>
       {boardRows}
     </>
