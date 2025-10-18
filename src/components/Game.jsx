@@ -88,6 +88,8 @@ function Game() {
 
   const sortedMoves = isAscending ? moves : moves.slice().reverse();
 
+  const lastMoveLocation = history[currentMove].location;
+
   return (
     <div className="game">
       {/* Left Panel for Controls and History */}
@@ -145,6 +147,7 @@ function Game() {
           squares={currentSquares}
           onPlay={handlePlay}
           boardSize={boardSize}
+          lastMoveLocation={lastMoveLocation}
         />
       </div>
     </div>

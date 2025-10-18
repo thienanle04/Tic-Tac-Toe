@@ -1,6 +1,5 @@
-function Square({ value, onSquareClick, isWinningSquare }) {
-  // Add the player's value as a class if it's a winning square
-  const className = `square ${isWinningSquare ? 'winner ' + value : ''}`;
+function Square({ value, onSquareClick, isWinningSquare, isLastMove }) {
+  const className = `square ${value ? value : ''} ${isWinningSquare ? 'winner ' + value : ''} ${isLastMove ? 'winner' : ''}`;
   return (
     <button className={className} onClick={onSquareClick}>
       {value}

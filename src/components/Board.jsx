@@ -1,6 +1,6 @@
 import Square from "./Square";
 
-function Board({ xIsNext, squares, onPlay, boardSize }) {
+function Board({ xIsNext, squares, onPlay, boardSize, lastMoveLocation }) {
   function handleClick(i) {
     if (winner || squares[i]) {
       return;
@@ -35,13 +35,19 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
     const rowSquares = [];
     for (let col = 0; col < boardSize; col++) {
       const squareIndex = row * boardSize + col;
+      
+      // Check if the current square being rendered is the last move
+      const isLastMove = lastMoveLocation && 
+                         lastMoveLocation.row === row && 
+                         lastMoveLocation.col === col;
+
       rowSquares.push(
         <Square
           key={squareIndex}
           value={squares[squareIndex]}
           onSquareClick={() => handleClick(squareIndex)}
-          // Pass a prop to the Square if it's part of the winning line.
           isWinningSquare={winningLine.includes(squareIndex)}
+          isLastMove={isLastMove}
         />
       );
     }
