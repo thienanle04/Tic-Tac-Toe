@@ -1,6 +1,6 @@
 function Square({ value, onSquareClick, isWinningSquare }) {
-  // A 'winner' class is conditionally added for styling.
-  const className = `square ${isWinningSquare ? 'winner' : ''}`;
+  // Add the player's value as a class if it's a winning square
+  const className = `square ${isWinningSquare ? 'winner ' + value : ''}`;
   return (
     <button className={className} onClick={onSquareClick}>
       {value}
@@ -8,4 +8,4 @@ function Square({ value, onSquareClick, isWinningSquare }) {
   );
 }
 
-export default Square
+export default Square;

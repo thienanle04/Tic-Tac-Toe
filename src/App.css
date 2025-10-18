@@ -1,95 +1,380 @@
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: sans-serif;
-  margin: 20px;
-  padding: 0;
-}
-
-h1 {
-  margin-top: 0;
-  font-size: 22px;
-}
-
-h2 {
-  margin-top: 0;
-  font-size: 20px;
-}
-
-h3 {
-  margin-top: 0;
-  font-size: 18px;
-}
-
-h4 {
-  margin-top: 0;
-  font-size: 16px;
-}
-
-h5 {
-  margin-top: 0;
-  font-size: 14px;
-}
-
-h6 {
-  margin-top: 0;
-  font-size: 12px;
-}
-
-code {
-  font-size: 1.2em;
-}
-
-ul {
-  padding-inline-start: 20px;
+/* Define a modern color palette and font using CSS variables */
+:root {
+  --primary-bg: #1a2a33;    /* Dark space blue */
+  --secondary-bg: #1f3641;  /* Slightly lighter blue for the board */
+  --accent-color: #31c3bd;  /* Teal for X */
+  --secondary-accent: #f2b137; /* Yellow for O */
+  --text-color: #a8bec9;    /* Light silver/grey for text */
+  --square-bg: #1f3641;     /* Same as secondary bg */
+  --font-family: 'Outfit', sans-serif;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family: sans-serif;
-  margin: 20px;
-  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--primary-bg);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* --- Main Game Layout --- */
+.game {
+  display: flex;
+  flex-direction: column; /* Stack panels on mobile */
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Left Panel Styling */
+.game-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+  min-width: 220px;
+  max-width: 260;
+}
+
+/* Right Game Area Styling */
+.game-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- Responsive Layout for Larger Screens --- */
+@media (min-width: 768px) {
+  .game {
+    flex-direction: row; /* Side-by-side on desktop */
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .game-panel {
+    order: 1; /* Left panel */
+  }
+  .game-area {
+    order: 2; /* Right area */
+  }
+}
+
+/* --- Board & Squares Styling --- */
+.board-container {
+  position: relative;
+  display: inline-block;
+}
+
+.board-row {
+  display: flex;
 }
 
 .square {
-  background: #fff;
-  border: 1px solid #999;
+  background: var(--square-bg);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0px 6px 0px 0px #10212a;
   float: left;
-  font-size: 24px;
+  font-size: 48px;
   font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
+  line-height: 80px;
+  height: 80px;
+  width: 80px;
+  margin: 8px;
   padding: 0;
   text-align: center;
-  width: 34px;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+  cursor: pointer;
+  /* Add color for X and O here */
+  color: var(--text-color); /* Default text color, but overridden below for X/O */
 }
 
-.board-row:after {
-  clear: both;
-  content: '';
-  display: table;
+/* Specific colors for X and O */
+.square.X {
+  color: var(--accent-color); /* Teal for X */
 }
 
-.status {
-  margin-bottom: 10px;
+.square.O {
+  color: var(--secondary-accent); /* Yellow/Orange for O */
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
+.square:hover {
+  background-color: #2e4756; /* Slightly lighter on hover */
 }
 
-.game-info {
-  margin-left: 20px;
+/* Style for X and O */
+.square:empty:hover::before {
+  opacity: 0.5;
 }
 
+/* Styling for the winning squares */
 .square.winner {
-  background-color: #90ee90;
+  background-color: var(--accent-color);
+  color: var(--primary-bg);
+  /* Add these animation lines */
+  animation-name: pulseAnimation;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.square.winner.O {
+  background-color: var(--secondary-accent);
+}
+
+/* --- Status --- */
+.status {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-height: 30px; /* Prevents layout shift */
+}
+
+/* --- Game Info & Move History Styling --- */
+.game-info {
+  width: 100%;
+  background-color: var(--secondary-bg);
+  padding: 10px; /* Reduced padding for a tighter look */
+  border-radius: 15px;
+  box-shadow: 0px 8px 0px 0px #10212a;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 10px;
+}
+
+.history-header h4 {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.game-info ol {
+  padding-left: 0;
+  list-style: none;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 5px; /* Space for the scrollbar */
+}
+
+/* Styling for each list item card */
+.game-info li {
+  margin-bottom: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover effect for non-current moves */
+.game-info li:not(.current-move):hover {
+  background-color: #2e4756;
+}
+
+/* The style for the currently selected move */
+.game-info li.current-move {
+  background-color: var(--text-color);
+}
+
+.game-info li button {
+  /* Reset button styles and apply flexbox for layout */
+  background: none;
+  border: none;
+  font-family: var(--font-family);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+}
+
+/* Disable pointer events on the button for the current move */
+.game-info li.current-move button {
+  cursor: default;
+}
+
+/* Style for the "Move #X" or "Game Start" text */
+.move-number {
+  font-weight: bold;
+  color: var(--primary-bg); /* Dark text on the light selected background */
+}
+/* When not selected, use the default light text */
+.game-info li:not(.current-move) .move-number {
+  color: var(--text-color);
+}
+
+/* Style for the player 'X' or 'O' */
+.move-player {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.move-player.X { color: var(--accent-color); }
+.move-player.O { color: var(--secondary-accent); }
+.game-info li.current-move .move-player {
+  color: var(--primary-bg); /* Dark text on the selected item */
+}
+
+/* Style for the (row, col) location */
+.move-location {
+  font-size: 0.9rem;
+  color: #6a8291; /* Dimmer color for less important info */
+}
+.game-info li.current-move .move-location {
+  color: var(--secondary-bg);
+}
+
+/* --- Custom Scrollbar for a cleaner look --- */
+.game-info ol::-webkit-scrollbar {
+  width: 8px;
+}
+.game-info ol::-webkit-scrollbar-track {
+  background: #10212a;
+  border-radius: 10px;
+}
+.game-info ol::-webkit-scrollbar-thumb {
+  background: #314a58;
+  border-radius: 10px;
+}
+.game-info ol::-webkit-scrollbar-thumb:hover {
+  background: #4a6a7c;
+}
+
+/* --- Settings & Toggle (Update this section) --- */
+.game-settings {
+  background-color: var(--secondary-bg);
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0px 8px 0px 0px #10212a;
+  display: flex;
+  flex-direction: column;
+  /* Increase this value to add more space */
+  gap: 25px; 
+}
+
+.board-size-select {
+  /* Text color for the label */
+  .MuiInputLabel-root {
+    color: var(--text-color) !important; 
+  }
+
+  /* Color for the select text itself */
+  .MuiSelect-select {
+    color: var(--text-color);
+  }
+
+  /* Color of the dropdown arrow */
+  .MuiSvgIcon-root {
+    color: var(--text-color);
+  }
+
+  /* Style the border */
+  .MuiOutlinedInput-notchedOutline {
+    border-color: var(--text-color) !important;
+  }
+  
+  /* Style the border on hover */
+  &:hover .MuiOutlinedInput-notchedOutline {
+    border-color: var(--accent-color) !important;
+  }
+  
+  /* Style the border when focused */
+  &.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--accent-color) !important;
+  }
+
+  /* Style the floating label when focused */
+  &.Mui-focused .MuiInputLabel-root {
+    color: var(--accent-color) !important;
+  }
+}
+
+.reset-button {
+  background-color: var(--secondary-accent); /* Use the 'O' color for high visibility */
+  color: var(--primary-bg);
+  border: none;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0px 4px 0px 0px #c68c29;
+  width: 100%;
+}
+
+.reset-button:hover {
+  background-color: #ffc860; /* Lighter yellow on hover */
+}
+
+.reset-button:active {
+  /* Gives the button a satisfying "press" effect */
+  transform: translateY(2px);
+  box-shadow: 0px 2px 0px 0px #c68c29;
+}
+
+/* Style for MUI ToggleButton */
+.MuiToggleButton-root {
+  background-color: #a8bec9 !important;
+  color: var(--primary-bg) !important;
+}
+
+.MuiToggleButton-root.Mui-selected {
+  background-color: var(--accent-color) !important;
+}
+
+.MuiMenu-paper {
+  background-color: #2e4756 !important; /* Dark background for the dropdown menu */
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+}
+
+.MuiMenuItem-root:hover {
+  background-color: #3b5c6d !important; /* Hover effect for items */
+}
+
+.MuiMenuItem-root.Mui-selected {
+  background-color: var(--accent-color) !important; /* Color for the selected item */
+  color: var(--primary-bg) !important;
+  font-weight: bold;
+}
+
+/* Make it responsive for smaller screens */
+@media (min-width: 768px) {
+  .game {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 50px;
+  }
+}
+
+@keyframes pulseAnimation {
+  0% {
+    transform: scale(1);
+    box-shadow: 0px 6px 0px 0px #10212a;
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0px 8px 0px 0px #10212a;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0px 6px 0px 0px #10212a;
+  }
 }
